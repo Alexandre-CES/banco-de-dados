@@ -50,3 +50,19 @@ def create():
     except Exception as ex:
         return format_error("Unexpected error", details=str(ex), code=500)
     
+
+@bp.route('/loadById', methods=['POST'])
+def load():
+    request_id = (request.json)['id']
+
+    try:
+        partner = db.session.execute(select(Partner).where(Partner.id == request_id)).scalar_one_or_none()
+
+        if partner:
+            partner = partner.as_dict()
+            return jsonify(partner), 200
+        else:
+            return jsonify(message='partner não encontrado'), 400
+
+    except Exception as ex:
+        return format_error('unexpected error', details=str(ex),code=500)
