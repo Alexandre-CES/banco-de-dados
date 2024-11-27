@@ -4,14 +4,16 @@ from app.models import Partner
 from geoalchemy2 import WKTElement
 from app.helpers import format_multipolygon, format_error
 from sqlalchemy import select
+from sqlalchemy import func
 
 bp = Blueprint('routes', __name__)
 
 @bp.route('/create', methods=['POST'])
 def create():
-    data = request.json
+    '''Create new partner'''
 
     try:
+        data = request.json
 
         #checking if id exit
         partnerId = db.session.execute(select(Partner).where(Partner.id == data['id'])).scalar_one_or_none()
@@ -53,9 +55,11 @@ def create():
 
 @bp.route('/loadById', methods=['POST'])
 def load():
-    request_id = (request.json)['id']
+    '''Receive id and load corresponding partner'''
 
     try:
+        request_id = (request.json)['id']
+
         partner = db.session.execute(select(Partner).where(Partner.id == request_id)).scalar_one_or_none()
 
         if partner:
@@ -64,5 +68,43 @@ def load():
         else:
             return jsonify(message='partner não encontrado'), 400
 
+    #errors
+    except TypeError as te:
+        return format_error('Invalid data type: ', details=str(te), code=400)
+    except ValueError as ve:
+        return format_error('Value error: ', details=str(ve), code=400)
+    except KeyError as ke:
+        return format_error("Missing data", details=f"Missing key: {ke}", code=400)
+    except Exception as ex:
+        return format_error('unexpected error', details=str(ex),code=500)
+
+@bp.route('/search', methods=['POST'])
+def search():
+    '''Search nearest partner from given coordinates'''
+
+    try:
+        request_coordinates = (request.json)['coordinates']
+        point = WKTElement(f"POINT({request_coordinates[0]} {request_coordinates[1]})", srid=4326)
+
+        #Consult nearest partner and distance
+        nearest_partner = (
+            db.session.query(Partner)
+            .filter(func.ST_Within(point, Partner.coverageArea))
+            .order_by(func.ST_Distance(Partner.coverageArea, point))
+            .first()
+        )
+        
+        if nearest_partner:
+            return jsonify(nearest_partner=nearest_partner.as_dict()), 200
+        else:
+            return jsonify(message="No partner found covering the given location"), 404
+
+    #errors
+    except TypeError as te:
+        return format_error('Invalid data type: ', details=str(te), code=400)
+    except ValueError as ve:
+        return format_error('Value error: ', details=str(ve), code=400)
+    except KeyError as ke:
+        return format_error("Missing data", details=f"Missing key: {ke}", code=400)
     except Exception as ex:
         return format_error('unexpected error', details=str(ex),code=500)
