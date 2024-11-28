@@ -44,4 +44,4 @@ link: https://github.com/ab-inbev-ze-company/ze-code-challenges/blob/master/back
     ```bash
     flask --app main.py run
 
-2. <a href="https://github.com/Alexandre-CES/banco-de-dados/edit/main/desafio/documentos/instructions.pdf" target="_blank">Instruções de uso</a>
+2. <a href="https://github.com/Alexandre-CES/banco-de-dados/edit/main/desafio/documents/instructions.pdf" target="_blank">Instruções de uso</a>
