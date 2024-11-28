@@ -31,12 +31,17 @@ link: https://github.com/ab-inbev-ze-company/ze-code-challenges/blob/master/back
     pip install requirements.txt
 
 6. Crie um arquivo ".env" na pasta do desafio e coloque os dados do mysql:
+    ```bash
     USERNAME=(usuário)
     PASSWORD=(senha)
     HOST=(geralmente localhost)
     PORT=(porta)
     DATABASE=(nome da base de dados que será usada)
 
-7. Rode o projeto:
+# Como utilizar
+
+1. Rode o projeto:
     ```bash
     flask --app main.py run
+
+2. <a href="https://github.com/Alexandre-CES/banco-de-dados/edit/main/desafio/documentos/instructions.pdf" target="_blank">Instruções de uso</a>
